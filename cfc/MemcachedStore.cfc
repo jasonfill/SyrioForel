@@ -1,27 +1,25 @@
 /*------------------------------------------------------------------------------
-Author 	    : 	Aaron Greenlee
-				This work is licensed under a Creative Commons Attribution-Share-Alike 3.0 Unported License
-				http://wreckingballmedia.com/
-
-
-Description : 	A ColdBox ObjectStore that supports the Memcached database as
-				well as the Amazone ElastiCache service.
-
-				Many thanks go to Job Hurschi for his contribution to our
-				community with the release of cfmemcached (download it at:
-				http://cfmemcached.riaforge.org/) with which this source code
-				is based.
-
-				Access the Java Memcached Client Docs
-				http://dustin.github.com/java-memcached-client/apidocs/
-
-
-------------------------------------------------------------------------------*/
+* Author 	    : 	Aaron Greenlee
+*				This work is licensed under a Creative Commons Attribution-Share-Alike 3.0 Unported License
+*				http://wreckingballmedia.com/
+*
+*
+* Description : 	A ColdBox ObjectStore that supports the Memcached database as
+*				well as the Amazone ElastiCache service.
+*
+*				Many thanks go to Job Hurschi for his contribution to our
+*				community with the release of cfmemcached (download it at:
+*				http://cfmemcached.riaforge.org/) with which this source code
+*				is based.
+*
+*				Access the Java Memcached Client Docs
+*				http://dustin.github.com/java-memcached-client/apidocs/
+*
+*
+*------------------------------------------------------------------------------*/
 
 /** CacheBox Object Store supporting native Memcached and Amazon ElastiCache. **/
-component
-output=false
-hint="I work with Memcached directly to store and obtain objects from your cache. I work hared. Love me."
+component output=false hint="I work with Memcached directly to store and obtain objects from your cache. I work hared. Love me."
 {
 	// Endpoints used by the Memcached Client.
 	variables.config =
@@ -42,7 +40,7 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	};
 
 	/**
-		@cacheProvider The associated cache provider as coldbox.system.cache.ICacheProvider.
+	*	@cacheProvider The associated cache provider as coldbox.system.cache.ICacheProvider.
 	**/
 	public MemcachedStore function init(required cacheProvider)
 	{
@@ -71,7 +69,7 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 		structAppend(variables.config,config,true);
 
 		// Validate the config...
-		//
+		
 		// Require All Config Keys
 		if (!arrayIsEmpty(missingKeys))
 			throw(
@@ -79,7 +77,7 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 				,detail='The MemcachedStore needs some information to be passed via the CacheBox.cfc settings file when a provider is defined for this cache. These settings would typically be passed as settings when a CacheBox Provider is constructed. The missing configuration settings are: #arrayToList(missingKeys)#.'
 				,errorCode='MemcachedStore.BadConfig'
 			);
-		//
+		
 		// Make sure we have a known endpoint or have permission to find one.
 		variables.config.endpoints = (len(trim(config.endpoints)) > 0) ? config.endpoints : "";
 		if (!config.discoverEndpoints && len(variables.config.endpoints) == 0)
@@ -120,11 +118,11 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 		JavaSystem.out.println("SyrioForel: Endpoints Discovered: #variables.config.endpoints#");
 
 		/*
-		if (!listContainsNoCase(variables.instance.hostname,'ec2'))
-			throw(
-			 	 message="Attempting External ElastiCache Access?"
-				,detail="It appears that you are trying to connect to an AWS ElastiCache instance from something other than an EC2. This just won't do! ElastiCache connections are only available within the AWS cloud. If you think this is an error please report it. The good news is that we detected cache nodes so things appear to be working properly."
-				,errorCode="MemcachedStore.AWSExternal");
+		*if (!listContainsNoCase(variables.instance.hostname,'ec2'))
+		*	throw(
+		*	 	 message="Attempting External ElastiCache Access?"
+		*		,detail="It appears that you are trying to connect to an AWS ElastiCache instance from something other than an EC2. This just won't do! ElastiCache connections are only available within the AWS cloud. If you think this is an error please report it. The good news is that we detected cache nodes so things appear to be working properly."
+		*		,errorCode="MemcachedStore.AWSExternal");
 		*/
 
 		variables.instance.indexer = createObject("component","#variables.config.dotNotationPathToCFCs#.MemcachedIndexer").init("");
@@ -220,8 +218,8 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		@timeout Defaults to no-timeout. Defines how many units of the TimeoutUnit before a timeout occurs.
-		@timeoutUnit AN instance of java.util.concurrent.TimeUnit.
+	*	@timeout Defaults to no-timeout. Defines how many units of the TimeoutUnit before a timeout occurs.
+	*	@timeoutUnit AN instance of java.util.concurrent.TimeUnit.
 	**/
 	public any function shutdown(
 		 numeric timeout=0
@@ -237,16 +235,16 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 		return variables.instance.memcached.shutdown();
 	}
 
-	// -------------------------------------------------------------------------
-	// PRIVATE
-	// -------------------------------------------------------------------------
+	/* -------------------------------------------------------------------------
+	* PRIVATE
+	*/
 
 	/**
-		A mini factory to build objects. Ensures only one Singleton is created
-		for our Memcached client and acts as a proxy for other builds to help
-		facilitate unit testing.
-
-		@alias An alias for the factory.
+	*	A mini factory to build objects. Ensures only one Singleton is created
+	*	for our Memcached client and acts as a proxy for other builds to help
+	*	facilitate unit testing.
+	*
+	*	@alias An alias for the factory.
 	**/
 	private any function build(required string alias){
 		switch(arguments.alias)
@@ -297,10 +295,10 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Build a new Memcached client instance. The result is saved within the
-		instance of this MemcachedStore and returned by this method.
-
-		@servers A space delimited list of servers the Memcached client should connect to.
+	*	Build a new Memcached client instance. The result is saved within the
+	*	instance of this MemcachedStore and returned by this method.
+	*
+	*	@servers A space delimited list of servers the Memcached client should connect to.
 	**/
 	private any function buildMemcached(){
 		if (!structKeyExists(variables.config,'endpoints') || trim(len(variables.config.endpoints)) == 0);
@@ -311,8 +309,8 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 		} catch (any e) {
 			throw(
 				message="Error creating Memcached client!"
-				detail="Error creating memcached client Java object. This is usually due to an inability to make a network connection to your Memcached server. Please check your firewall settings. Trying to connect to: #variables.config.endpoints#."
-				errorCode="MemcachedStore.ObjectInstatiationException"
+				,detail="Error creating memcached client Java object. This is usually due to an inability to make a network connection to your Memcached server. Please check your firewall settings. Trying to connect to: #variables.config.endpoints#."
+				,errorCode="MemcachedStore.ObjectInstatiationException"
 			);
 		}
 		variables.instance.timeUnit = build("TimeUnit");
@@ -358,9 +356,9 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/** Deserializes the given value from a byte stream.
-		Includes support for multiple keys being returned
-
-		@value The value to deserialize.
+	*	Includes support for multiple keys being returned
+	*
+	*	@value The value to deserialize.
 	**/
 	private any function deserialize()
 	{
@@ -414,21 +412,21 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Add an object to the cache if it does not exist already. Returns a
-		future representing the processing of this operation.
-
-		@key The key to cache. Keys are case-sensitive.
-		@value The value to cache.
-		@expiry The exp value is passed along to memcached exactly as given, and will be processed per
-		the memcached protocol specification:
-
-		The actual value sent may either be Unix time
-		(number of seconds since January 1, 1970, as a 32-bit value),
-		or a number of seconds starting from current time.
-		In the latter case, this number of seconds may not
-		exceed 60*60*24*30 (number of seconds in 30 days);
-		if the number sent by a client is larger than that, the server will consider it to be
-		real Unix time value rather than an offset from current time.
+	*	Add an object to the cache if it does not exist already. Returns a
+*		future representing the processing of this operation.
+*
+*		@key The key to cache. Keys are case-sensitive.
+*		@value The value to cache.
+*		@expiry The exp value is passed along to memcached exactly as given, and will be processed per
+*		the memcached protocol specification:
+*
+*		The actual value sent may either be Unix time
+*		(number of seconds since January 1, 1970, as a 32-bit value),
+*		or a number of seconds starting from current time.
+*		In the latter case, this number of seconds may not
+*		exceed 60*60*24*30 (number of seconds in 30 days);
+*		if the number sent by a client is larger than that, the server will consider it to be
+*		real Unix time value rather than an offset from current time.
 	**/
 	private function add(
 		 required string key
@@ -449,13 +447,13 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Get the given key asynchronously. returns the future value of those keys
-		what you get back wht you use this function is an object that has the future value
-		of the key you asked to retrieve.  You can check at anytime to see if the value has been
-		retrieved by using the  ret.isDone() method. once you get a true from that value, you
-		need to then call the ret.get() function.
-
-		@key Given a key, get the value for the key asnycronously. Case-Sensitive.
+	*	Get the given key asynchronously. returns the future value of those keys
+	*	what you get back wht you use this function is an object that has the future value
+	*	of the key you asked to retrieve.  You can check at anytime to see if the value has been
+	*	retrieved by using the  ret.isDone() method. once you get a true from that value, you
+	*	need to then call the ret.get() function.
+*
+*		@key Given a key, get the value for the key asnycronously. Case-Sensitive.
 	**/
 	private any function asyncGet(required string key)
 	{
@@ -475,7 +473,7 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Get with a single key. Blocks until the server responds.
+		*Get with a single key. Blocks until the server responds.
 	**/
 	private any function blockingGet(
 		 required key
@@ -521,7 +519,7 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Get with a single key. Blocks until the server responds.
+	*	Get with a single key. Blocks until the server responds.
 	**/
 	private any function blockingBulkGet(
 		 required array keys
@@ -587,9 +585,9 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Shortcut to delete that will immediately delete the item from the cache.
-		or in the delay specified. returns a future object that allows you to
-		check back on the processing further if you choose.
+	*	Shortcut to delete that will immediately delete the item from the cache.
+	*	or in the delay specified. returns a future object that allows you to
+	*	check back on the processing further if you choose.
 	**/
 	private any function delete(
 		 required key
@@ -658,9 +656,9 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Using the provided AWS Access and Secret keys this method will talk to
-		AWS and return either an empty string or a space-delemited list of the
-		cache endpoints it discovered using your credentials.
+	*	Using the provided AWS Access and Secret keys this method will talk to
+	*	AWS and return either an empty string or a space-delemited list of the
+	*	cache endpoints it discovered using your credentials.
 	**/
 	private string function discoverAWSEndpoints(required config)
 	{
@@ -690,8 +688,8 @@ hint="I work with Memcached directly to store and obtain objects from your cache
 	}
 
 	/**
-		Appends environment information to the cached key to avoid
-		collisions between environments and application names.
+	*	Appends environment information to the cached key to avoid
+	*	collisions between environments and application names.
 	**/
 	private function parseKey(required any k)
 	{
